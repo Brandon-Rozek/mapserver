@@ -23,6 +23,6 @@ setup(
     include_package_data=True,
     data_files=data_files,
     scripts=['servemaps'],
-    install_requires=['Flask~=1.1.2'],
+    install_requires=['Flask~=1.1.2', 'gevent~=21.1.2'],
     python_requires='>=3.7'
 )

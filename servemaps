@@ -2,9 +2,13 @@
 """
 Small flask server to serve map tiles.
 """
+from gevent import monkey
+monkey.patch_all()
+from gevent.pywsgi import WSGIServer
 from argparse import ArgumentParser
-import importlib.util
 from http import HTTPStatus
+from os import getcwd
+import importlib.util
 import errno
 import os.path
 import sys
@@ -23,7 +27,7 @@ args = vars(parser.parse_args())
 
 
 # Try to locate mapserver folder
-root_path = "mapserver"
+root_path = getcwd() + "/mapserver"
 if not os.path.isdir(root_path):
     spec_location = importlib.util.find_spec('mapserver')
     if spec_location is None or spec_location.origin is None:
@@ -49,7 +53,9 @@ def index():
 
 if __name__ == '__main__':
     try:
-        app.run(port=args['port'])
+        http_server = WSGIServer(('', args['port']), app)
+        print(f"Starting map server on http://localhost:{args['port']}")
+        http_server.serve_forever()
     except OSError as e:
         if e.errno == errno.EADDRINUSE:
             print("Address-Port Combination in use. Is another servemaps running?")
